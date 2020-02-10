@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="es" dir="ltr">
 
 <head>
-    <title>Draw a point</title>
+    <title>Ejercicio3</title>
 </head>
 
 <body onload="init()">
@@ -17,10 +17,11 @@
     }
 </script>
 
-
 <script id="shaderFs" type="x-shader/x-fragment">
+  precision mediump float;
+  uniform vec4 a_FragColor;
     void main() {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        gl_FragColor = a_FragColor;
     }
 </script>
 
@@ -58,6 +59,7 @@
     }
 
     var coordenadas = [];
+    var rgba = [];
 
     function click(ev, gl, canvas) {
       // Coordinates of canvas origin
@@ -73,17 +75,44 @@
       var y = (halfCanvasHeight - clickY) / halfCanvasHeight;
       var xyz = [x, y, 0];
 
+      // Variable de posicion y la añado
       coordenadas.push(xyz);
       var a_Position = gl.getAttribLocation(gl.program, "a_Position");
 
+      // Color punto añadido
+      var a_FragColor = gl.getUniformLocation(gl.program, "a_FragColor");
+      var eleccion_Color = [];
+
+      if (x>0.7 || x<-0.7 || y>0.7 || y<-0.7) {
+        eleccion_Color = [1.0 , 1.0, 1.0, 1.0];
+      }else {
+        if (x>0) {
+          if (y>0) {
+            eleccion_Color = [1.0 , 0.0, 0.0, 1.0];
+          }else {
+            eleccion_Color = [0.0 , 1.0, 0.0, 1.0];
+          }
+        }else {
+          if (y>0) {
+            eleccion_Color = [0.47 , 0.16, 0.55, 1.0];
+          }else {
+            eleccion_Color = [0.0 , 0.0, 1.0, 1.0];
+          }
+        }
+      }
+
+      rgba.push(eleccion_Color);
+
+      // Limpieza
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
+      // Pintamos el punto
       for (var i = 0; i < coordenadas.length; i++) {
-          console.log(coordenadas[i]);
 
-          gl.vertexAttrib3fv(a_Position, coordenadas[i]);
-          gl.drawArrays(gl.POINTS, 0, 1);
+        gl.vertexAttrib3fv(a_Position, coordenadas[i]);
+        gl.uniform4fv (a_FragColor, rgba[i]);
+        gl.drawArrays(gl.POINTS, 0, 1);
 
       }
     }
