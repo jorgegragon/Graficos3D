@@ -11,9 +11,10 @@
 
 <script id="shaderVs" type="x-shader/x-vertex">
 	attribute vec4 a_Position;
+  attribute float a_Tamano;
     void main() {
         gl_Position = a_Position;
-        gl_PointSize = 10.0;
+        gl_PointSize = a_Tamano;
     }
 </script>
 
@@ -60,6 +61,7 @@
 
     var coordenadas = [];
     var rgba = [];
+    var tamano = [];
 
     function click(ev, gl, canvas) {
       // Coordinates of canvas origin
@@ -83,9 +85,15 @@
       var a_FragColor = gl.getUniformLocation(gl.program, "a_FragColor");
       var eleccion_Color = [];
 
+      // Eleccion tamaño
+      var a_Tamano = gl.getAttribLocation(gl.program, "a_Tamano");
+      var eleccion_Tamano = 0;
+
       if (x>0.7 || x<-0.7 || y>0.7 || y<-0.7) {
         eleccion_Color = [1.0 , 1.0, 1.0, 1.0];
+        eleccion_Tamano = 20.0;
       }else {
+        eleccion_Tamano = 10.0;
         if (x>0) {
           if (y>0) {
             eleccion_Color = [1.0 , 0.0, 0.0, 1.0];
@@ -102,6 +110,7 @@
       }
 
       rgba.push(eleccion_Color);
+      tamano.push(eleccion_Tamano);
 
       // Limpieza
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -111,7 +120,9 @@
       for (var i = 0; i < coordenadas.length; i++) {
 
         gl.vertexAttrib3fv(a_Position, coordenadas[i]);
+        gl.vertexAttrib1f(a_Tamano, tamano[i]);
         gl.uniform4fv (a_FragColor, rgba[i]);
+        console.log (tamano[i]);
         gl.drawArrays(gl.POINTS, 0, 1);
 
       }
