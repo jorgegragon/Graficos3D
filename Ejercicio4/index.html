@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="es" dir="ltr">
 
 <head>
-    <title>WebGL transformations: scale</title>
+    <title>Ejercicio4</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 
@@ -22,13 +22,13 @@
 
     <script>
         var gl;
-        var count = 0.0;
         var matrix = mat4.create();
-        var scale = [];
+        var scale = 1;
         var position = [];
         var ejeX = 0;
         var ejeY = 0;
         var ejeZ = 0;
+        var accion = 0;
 
         function init() {
             // Get canvas object from the DOM
@@ -56,24 +56,45 @@
             var step = new Number(document.getElementById("step").value);
             switch (ev.keyCode) {
               case 37: // Left
-                ejeX = coordenadas[0];
-                coordenadas[0] = ejeX - step;
+                ejeX = ejeX - step;
+                console.log("izquierda");
+                break;
               case 39: // Right
-                ejeX = coordenadas[0];
-                coordenadas[0] = ejeX + step;
-                console.log(ejeX);
+                ejeX = ejeX + step;
+                console.log("derecha");
+                break;
               case 38: // Up
-                ejeY = coordenadas[1];
-                coordenadas[1] = ejeY + step;
+                ejeY = ejeY + step;
+                console.log("arriba");
+                break;
               case 40: // Down
                 ejeY = ejeY - step;
+                console.log("abajo");
+                break;
               case 33: // PageUp
+                if (scale<2){
+                  scale = scale + step;
+                }else{
+                  break;
+                }
+                console.log(scale);
                 break;
               case 34: // PageDown
+                if (scale>0){
+                  scale = scale - step;
+                }else{
+                  break;
+                }
+                console.log("reducir");
                 break;
               case 36: // Home
+                console.log("Home");
                 break;
               case 35: // End
+                console.log("End");
+                break;
+              default:
+                console.log("Tecla no contemplada.");
                 break;
               }
             };
@@ -83,21 +104,20 @@
 
         function drawScene() {
             // Clear canvas
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            // Calcualte new scale
-
             //var matrix = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
-            matrix= mat4.fromTranslation(matrix, [ejeX, ejeY, ejeZ]);
+            var scaled = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
+            var translated= mat4.fromTranslation(mat4.create(), [ejeX, ejeY, 0.0]);
+            var matrix= mat4.multiply(mat4.create(), scaled, translated);
+            //console.log([ejeX, ejeY, ejeZ]);
             // Set uniform value (u_Matrix) in vertex shader
             var mvMatrixUniform = gl.getUniformLocation(gl.program, "u_Matrix");
             gl.uniformMatrix4fv(mvMatrixUniform, false, matrix);
 
             // Draw
             gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-            // Call drawScene again in the next browser repaint
-            count += 0.01;
 
             requestAnimationFrame(drawScene);
         }
