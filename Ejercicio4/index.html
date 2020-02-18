@@ -23,6 +23,12 @@
     <script>
         var gl;
         var count = 0.0;
+        var matrix = mat4.create();
+        var scale = [];
+        var position = [];
+        var ejeX = 0;
+        var ejeY = 0;
+        var ejeZ = 0;
 
         function init() {
             // Get canvas object from the DOM
@@ -50,13 +56,17 @@
             var step = new Number(document.getElementById("step").value);
             switch (ev.keyCode) {
               case 37: // Left
-                break;
+                ejeX = coordenadas[0];
+                coordenadas[0] = ejeX - step;
               case 39: // Right
-                break;
+                ejeX = coordenadas[0];
+                coordenadas[0] = ejeX + step;
+                console.log(ejeX);
               case 38: // Up
-                break;
+                ejeY = coordenadas[1];
+                coordenadas[1] = ejeY + step;
               case 40: // Down
-                break;
+                ejeY = ejeY - step;
               case 33: // PageUp
                 break;
               case 34: // PageDown
@@ -76,9 +86,9 @@
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             // Calcualte new scale
-            var scale = Math.abs(Math.sin(count));
-            var matrix = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
 
+            //var matrix = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
+            matrix= mat4.fromTranslation(matrix, [ejeX, ejeY, ejeZ]);
             // Set uniform value (u_Matrix) in vertex shader
             var mvMatrixUniform = gl.getUniformLocation(gl.program, "u_Matrix");
             gl.uniformMatrix4fv(mvMatrixUniform, false, matrix);
