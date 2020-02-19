@@ -16,7 +16,7 @@
 
     <script id="shaderFs" type="x-shader/x-fragment">
         void main() {
-            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            gl_FragColor = vec4(0.9, 0.3, 0.1, 1.0);
         }
     </script>
 
@@ -29,6 +29,7 @@
         var ejeY = 0;
         var ejeZ = 0;
         var accion = 0;
+        var count = 0;
 
         function init() {
             // Get canvas object from the DOM
@@ -77,10 +78,10 @@
                 }else{
                   break;
                 }
-                console.log(scale);
+                console.log("ampliar");
                 break;
               case 34: // PageDown
-                if (scale>0){
+                if (scale>0.01){
                   scale = scale - step;
                 }else{
                   break;
@@ -88,10 +89,12 @@
                 console.log("reducir");
                 break;
               case 36: // Home
-                console.log("Home");
+                count = count + step;
+                console.log(matrix);
                 break;
               case 35: // End
-                console.log("End");
+                count = count - step;
+                console.log(matrix);
                 break;
               default:
                 console.log("Tecla no contemplada.");
@@ -108,10 +111,12 @@
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             //var matrix = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
-            var scaled = mat4.fromScaling(mat4.create(), [scale, scale, 0.0]);
-            var translated= mat4.fromTranslation(mat4.create(), [ejeX, ejeY, 0.0]);
-            var matrix= mat4.multiply(mat4.create(), scaled, translated);
-            //console.log([ejeX, ejeY, ejeZ]);
+            var scaled = mat4.fromScaling(mat4.create(), [scale, scale, 1.0]);
+            var translated= mat4.fromTranslation(mat4.create(), [ejeX, ejeY, 1.0]);
+            var rotate= mat4.fromZRotation(mat4.create(), count);
+            var mama= mat4.multiply(mat4.create(), scaled, translated);
+            matrix= mat4.multiply(mat4.create(), mama, rotate);
+            //console.log(rotate);
             // Set uniform value (u_Matrix) in vertex shader
             var mvMatrixUniform = gl.getUniformLocation(gl.program, "u_Matrix");
             gl.uniformMatrix4fv(mvMatrixUniform, false, matrix);
@@ -125,8 +130,8 @@
         function initVertexBuffers(gl) {
           var dim = 2;
           var vertices= new Float32Array(
-            [-0.5, 0.5, 0.5, 0.5, 0.5, -0.5,
-             -0.5, 0.5, 0.5, -0.5, -0.5, -0.5
+            [-0.2, 0.2, 0.2, 0.2, 0.2, -0.2,
+             -0.2, 0.2, 0.2, -0.2, -0.2, -0.2
             ]);
             // Create a buffer object
             gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
